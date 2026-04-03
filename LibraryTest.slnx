@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../TestPerfomance/TestProject1/TestProject1.csproj" Id="57d990f5-0ba0-4e35-b899-cbd68714b61c" />
+  <Project Path="LibraryTest.csproj" />
+</Solution>

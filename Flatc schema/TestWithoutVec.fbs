@@ -1,0 +1,10 @@
+namespace LibraryTest1;
+
+table OmegaData {
+  time: uint32;
+  press: int32;
+  temp: int32;
+  vbat: uint32;
+}
+
+root_type OmegaData;

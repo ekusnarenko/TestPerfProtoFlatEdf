@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package LibraryTest;
+
+
+message OmegaDataForProto {
+  uint32 time = 1;
+  int32 press = 2;
+  int32 temp = 3;
+  uint32 vbat = 4; 
+}

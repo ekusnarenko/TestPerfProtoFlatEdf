@@ -1,0 +1,14 @@
+namespace LibraryTest;
+
+table OmegaDataV1_1 {
+  time: uint32;
+  press: int32;
+  temp: int32;
+  vbat: uint32;
+}
+
+table OmegaDataList {
+  items: [OmegaDataV1_1];
+}
+
+root_type OmegaDataList;
