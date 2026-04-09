@@ -1,11 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using Google.FlatBuffers;
-using System.Diagnostics.CodeAnalysis;
-using System.Timers;
-using LibraryTest1;
-using System.Security.Cryptography.X509Certificates;
 
 namespace LibraryTest;
 
@@ -42,10 +37,10 @@ public class TestPerfSer
         {
             var protoWithoutRec = new OmegaDataForProto();
             var proto = new OmegaDataV11ForProto();
-            protoWithoutRec.Time = proto.Time = _dataforEdf[i].Time = (uint)rnd.Next(1, 100);
-            protoWithoutRec.Press = proto.Press = _dataforEdf[i].Press = rnd.Next(1, 100);
-            protoWithoutRec.Temp = proto.Temp = _dataforEdf[i].Temp = rnd.Next(1, 100);
-            protoWithoutRec.Vbat = proto.Vbat = _dataforEdf[i].Vbat = (uint)rnd.Next(1, 100);
+            protoWithoutRec.Time = proto.Time = _dataforEdf[i].Time = 1;
+            protoWithoutRec.Press = proto.Press = _dataforEdf[i].Press = 2;
+            protoWithoutRec.Temp = proto.Temp = _dataforEdf[i].Temp = 3;
+            protoWithoutRec.Vbat = proto.Vbat = _dataforEdf[i].Vbat = 4;
             _dataforProto[i] = proto;
             _dataProtoWithoutRec[i] = protoWithoutRec;
         }

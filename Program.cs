@@ -8,16 +8,6 @@ internal class Program
 
     static void Main(string[] args)
     {
-        /*
-          var config = ManualConfig.CreateEmpty()
-              .AddLogger(ConsoleLogger.Default) // Вывод в консоль
-              .AddColumnProvider(DefaultConfig.Instance.GetColumnProviders().ToArray())
-              .AddExporter(DefaultConfig.Instance.GetExporters().ToArray())
-              .AddJob(Job.Default
-                  .WithRuntime(BenchmarkDotNet.Environments.CoreRuntime.Core10_0) 
-                  .WithId("JitJob")
-      );
-          */
         var serialize = BenchmarkRunner.Run<TestPerfSer>();
         /*
          | Method                | Mean     | Error   | StdDev  | Ratio | RatioSD | Gen0    | Gen1   | Allocated | Alloc Ratio |
@@ -58,6 +48,5 @@ internal class Program
         | DesProto             | 492.0 us |  9.70 us | 11.92 us |  0.73 |    0.02 |   7.8125 |  0.9766 |   69.25 KB |        0.35 |
         | DesProtoWithoutRec   | 956.0 us | 18.35 us | 24.50 us |  1.41 |    0.04 | 523.4375 | 35.1563 | 4279.97 KB |       21.42 |
         */
-
     }
 }
