@@ -10,8 +10,7 @@ namespace LibraryTest;
 
 public class Serialize
 {
-
-    public static string PathFile = "C:/Users/Katy/Documents/Projects/";
+    private static string FilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
     //Protobuf
     public static void SerializeProtobuf(OmegaDataV11ForProto[] s)
@@ -19,7 +18,7 @@ public class Serialize
         var batch = new OmegaDataBatch();
         batch.Records.AddRange(s);
 
-        using (var w = File.Create(PathFile + "ProtobufTest.bdf"))
+        using (var w = File.Create(FilePath + "/ProtobufTest.bdf"))
         {
             batch.WriteTo(w);
         }
@@ -27,43 +26,49 @@ public class Serialize
 
     public static void SerializeProtoWithoutRec(OmegaDataForProto[] s)
     {
-        //var omegaData = new OmegaDataForProto();
+        const int bufferSize = 64 * 1024;
 
-        using (var w = File.Create(PathFile + "ProtobufTestWithoutRec.bdf"))
+        using var fs = new FileStream(FilePath + "/ProtobufTestWithoutRec.bdf", FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan);
+        using var buffered = new BufferedStream(fs, bufferSize);
+        var cos = new CodedOutputStream(buffered);
+
+        foreach (var item in s)
         {
-            foreach (var item in s)
-            {
-                item.WriteDelimitedTo(w);
-            }
+            int size = item.CalculateSize();
+            cos.WriteUInt32((uint)size);
+            item.WriteTo(cos);
+
         }
+        cos.Flush();
+        buffered.Flush();
     }
 
     //FlatBuffer
     public static void SerializeFlatBufferWithoutVec()
     {
-        using var write = File.Create(PathFile + "FlactBufWitoutVec.bdf");
+        using var write = File.Create(FilePath + "/FlactBufWitoutVec.bdf");
         FlatBufferBuilder builder = new FlatBufferBuilder(1024);
+       
+        var rnd = new Random();
         for (var i = 0; i < 1000; i++)
         {
             builder.Clear();
 
-            uint time = 0x11;
-            int press = 0x22;
-            int temp = 0x33;
-            uint vbat = 0x44;
+            OmegaData.StartOmegaData(builder);
+            OmegaData.AddTime(builder, 0x11);
+            OmegaData.AddPress(builder, 0x22);
+            OmegaData.AddTemp(builder, 0x33);
+            OmegaData.AddVbat(builder, 0x44);
+            var endOffset = OmegaData.EndOmegaData(builder);
 
-            Offset<OmegaData> offset = OmegaData.CreateOmegaData(builder,
-                time, press, temp, vbat);
-
-            builder.FinishSizePrefixed(offset.Value);
+            OmegaData.FinishOmegaDataBuffer(builder, endOffset);
             var bytes = builder.SizedByteArray();
             write.Write(bytes);
         }
     }
     public static void SerializeFlatBuffer()
     {
-        //   string folderPath = @"C:\Users\Katy\Documents\Projects";
-        string fileName = Path.Combine(PathFile, "FlatBuffer.bdf");
+       string fileName = FilePath + "/FlatBuffer.bdf";
 
         var random = new Random();
 
@@ -72,17 +77,12 @@ public class Serialize
 
         for (int i = 0; i < 1000; ++i)
         {
-            uint time = 0x11;
-            int press = 0x22;
-            int temp = 0x33;
-            uint vbat = 0x44;
-
             offsets[i] = OmegaDataV1_1.CreateOmegaDataV1_1(
             builder,
-            time,
-            press,
-            temp,
-            vbat);
+            0x11,
+            0x22,
+            0x33,
+            0x44);
         }
 
         var vectorOffset = OmegaDataList.CreateItemsVector(builder, offsets);
@@ -115,7 +115,7 @@ public class Serialize
             }
         };
 
-        using (var file = File.Create(PathFile + "EDFTest.bdf"))
+        using (var file = File.Create(FilePath + "/EDFTest.bdf"))
         using (var w = new BinWriter(file))
         {
             w.Write(typeRec);

@@ -13,7 +13,7 @@ namespace LibraryTest;
 [SimpleJob(RuntimeMoniker.Net10_0)]
 public class TestPerfSer
 {
-   // [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+    // [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     public struct OMEGA_DATA_V1_1forEdf
     {
         public UInt32 Time { get; set; }
@@ -28,31 +28,26 @@ public class TestPerfSer
     private OMEGA_DATA_V1_1forEdf[] _dataforEdf;
     private OmegaDataV11ForProto[] _dataforProto;
     private OmegaDataForProto[] _dataProtoWithoutRec;
-    
 
     [GlobalSetup]
     public void Setup()
     {
+        var rnd = new Random();
         _dataforEdf = new OMEGA_DATA_V1_1forEdf[Count];
         _dataforProto = new OmegaDataV11ForProto[Count];
         _dataProtoWithoutRec = new OmegaDataForProto[Count];
-      
+
         FlatBufferBuilder builder = new FlatBufferBuilder(1024);
-        //var random = new Random();
         for (int i = 0; i < Count; ++i)
         {
             var protoWithoutRec = new OmegaDataForProto();
             var proto = new OmegaDataV11ForProto();
-            protoWithoutRec.Time = proto.Time = _dataforEdf[i].Time = 0x11;
-            protoWithoutRec.Press = proto.Press = _dataforEdf[i].Press = 0x22;
-            protoWithoutRec.Temp = proto.Temp = _dataforEdf[i].Temp = 0x33;
-            protoWithoutRec.Vbat = proto.Vbat = _dataforEdf[i].Vbat = 0x44;
+            protoWithoutRec.Time = proto.Time = _dataforEdf[i].Time = (uint)rnd.Next(1, 100);
+            protoWithoutRec.Press = proto.Press = _dataforEdf[i].Press = rnd.Next(1, 100);
+            protoWithoutRec.Temp = proto.Temp = _dataforEdf[i].Temp = rnd.Next(1, 100);
+            protoWithoutRec.Vbat = proto.Vbat = _dataforEdf[i].Vbat = (uint)rnd.Next(1, 100);
             _dataforProto[i] = proto;
             _dataProtoWithoutRec[i] = protoWithoutRec;
-            //s[i].Time = (uint)random.Next(1, 1000000);
-            //s[i].Press = random.Next(1, 200000);
-            //s[i].Temp = random.Next(1, 40000);
-            //s[i].Vbat = 20000;
         }
     }
 
