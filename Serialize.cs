@@ -11,7 +11,6 @@ namespace LibraryTest;
 public class Serialize
 {
     private static string FilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
     //Protobuf
     public static void SerializeProtobuf(OmegaDataV11ForProto[] s)
     {
@@ -96,14 +95,14 @@ public class Serialize
     }
 
     //EDF
-    public static void SerializeEDF(OMEGA_DATA_V1_1forEdf[] s)
+    public static void SerializeEDF(OMEGA_DATA_V1_1[] s)
     {
         var typeRec = new TypeRec()
         {
             Inf = new()
             {
                 Type = PoType.Struct,
-                Name = "OMEGA_DATA_V1_1forEdf",
+                Name = "OMEGA_DATA_V1_1",
                 Childs =
                 [
                     new(PoType.UInt32, "Time"),
@@ -114,7 +113,6 @@ public class Serialize
                 ]
             }
         };
-
         using (var file = File.Create(Path.Combine(FilePath, "EDFTest.bdf")))
         using (var w = new BinWriter(file))
         {
@@ -122,6 +120,31 @@ public class Serialize
             foreach (var item in s)
                 w.Write(item);
         }
+    }
 
+    public static void SerializeBinaryWr(OMEGA_DATA_V1_1[] s)
+    {
+        using var w = new BinaryWriter(File.Create(Path.Combine(FilePath, "BinaryWriterFile.bdf")));
+        for(int i = 0; i < s.Length; i++)
+        {
+            w.Write(s[i].Time);
+            w.Write(s[i].Press);
+            w.Write(s[i].Temp);
+            w.Write(s[i].Vbat);
+        }
+        w.Close();
+    }
+
+    public static void SerializeFileWr(OMEGA_DATA_V1_1[] s)
+    {
+        using var w = new FileStream(Path.Combine(FilePath, "FileStream.bdf"), FileMode.Create, FileAccess.Write);
+        for(int i = 0; i < s.Length; ++i)
+        {
+            w.Write(BitConverter.GetBytes(s[i].Time));
+            w.Write(BitConverter.GetBytes(s[i].Press));
+            w.Write(BitConverter.GetBytes(s[i].Temp));
+            w.Write(BitConverter.GetBytes(s[i].Vbat));
+        }
+        w.Close();
     }
 }

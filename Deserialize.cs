@@ -23,7 +23,7 @@ public class Deserialize
 
     public static void ProtobufReadWithoutRec()
     {
-        using FileStream fs = new FileStream(Path.Combine(FilePath,"ProtobufTestWithoutRec.bdf"), FileMode.Open, FileAccess.Read);
+        using FileStream fs = new FileStream(Path.Combine(FilePath, "ProtobufTestWithoutRec.bdf"), FileMode.Open, FileAccess.Read);
         using TextWriter w = new StreamWriter(Path.Combine(FilePath, "protobufreadWithoutRec.txt"));
         using var buffered = new BufferedStream(fs, 64 * 1024);
         var cis = new CodedInputStream(buffered);
@@ -74,11 +74,11 @@ public class Deserialize
         w.Write(';');
         w.Write(omegaData.Vbat);
         w.Write("\n");
-       
+
     }
     public static void FlatBuffWithoutRecRead()
     {
-        using FileStream fs = new FileStream(Path.Combine(FilePath,"FlactBufWitoutVec.bdf"), FileMode.Open, FileAccess.Read);
+        using FileStream fs = new FileStream(Path.Combine(FilePath, "FlactBufWitoutVec.bdf"), FileMode.Open, FileAccess.Read);
         using TextWriter w = new StreamWriter(Path.Combine(FilePath, "FlactBufWitoutVec.txt"));
         byte[] bytes = File.ReadAllBytes(Path.Combine(FilePath, "FlactBufWitoutVec.bdf"));
         byte[] buf = new byte[36];
@@ -110,18 +110,17 @@ public class Deserialize
             w.Write("\n");
             check += (item.Time == 1 && item.Press == 2 && item.Temp == 3 && item.Vbat == 4) ? 0 : 1;
         }
-
     }
     public static void FlatBuffRead()
     {
-        using TextWriter w = new StreamWriter(Path.Combine(FilePath,"flatBuf.txt"));
+        using TextWriter w = new StreamWriter(Path.Combine(FilePath, "flatBuf.txt"));
         byte[] bytes = File.ReadAllBytes(Path.Combine(FilePath, "FlatBuffer.bdf"));
         var dataList = OmegaDataList.GetRootAsOmegaDataList(new ByteBuffer(bytes));
 
         int length = dataList.ItemsLength;
         int check = 0;
         PrintToTextStream(w, ref dataList, ref length, check);
-        if(check > 1)
+        if (check > 1)
             Console.WriteLine($"error count={check}");
     }
 
@@ -138,7 +137,7 @@ public class Deserialize
 
         reader.ReadBlock();
         var rec = reader.ReadInfo();
-        OMEGA_DATA_V1_1forEdf read;
+        OMEGA_DATA_V1_1 read;
         try
         {
             while (reader.ReadBlock() && BlockType.VarData == reader.GetBlockType())
@@ -153,10 +152,10 @@ public class Deserialize
         catch (EndOfStreamException ex)
         {
         }
-        if(check > 1)
+        if (check > 1)
             Console.WriteLine($"error count={check}");
     }
-    public static void PrintToTextStream(TextWriter w, ref OMEGA_DATA_V1_1forEdf read)
+    public static void PrintToTextStream(TextWriter w, ref OMEGA_DATA_V1_1 read)
     {
         w.Write(read.Time);
         w.Write(';');
@@ -167,4 +166,58 @@ public class Deserialize
         w.Write(read.Vbat);
         w.Write("\n");
     }
+
+    public static void ReadBinRead()
+    {
+        using var r = new BinaryReader(File.OpenRead(Path.Combine(FilePath, "BinaryWriterFile.bdf")));
+        using TextWriter w = new StreamWriter(File.Create(Path.Combine(FilePath, "BinaryWriterFile.txt")));
+        var data = new OMEGA_DATA_V1_1();
+        int check = 0;
+
+        for (int i = 0; i < 1000; ++i)
+        {
+            data.Time = r.ReadUInt32();
+            data.Press = r.ReadInt32();
+            data.Temp = r.ReadInt32();
+            data.Vbat = r.ReadUInt32();
+            PrintToTextStream(w, ref data);
+            check += (data.Time == 1 && data.Press == 2 && data.Temp == 3 && data.Vbat == 4) ? 0 : 1;
+        }
+        r.Close();
+        if (check > 1)
+            Console.WriteLine($"error count={check}");
+    }
+    public static void ReadFileSt()
+    {
+        using var r = new FileStream(Path.Combine(FilePath, "FileStream.bdf"), FileMode.Open, FileAccess.Read);
+        using TextWriter w = new StreamWriter(File.Create(Path.Combine(FilePath, "FileStream.txt")));
+        var data = new OMEGA_DATA_V1_1();
+        byte[] buffer = new byte[r.Length];
+        for (int i = 0; i < buffer.Length; ++i)
+            buffer[i] = (byte)r.ReadByte();
+        
+        r.Close();
+        int j = 0;
+        int check = 0;
+        while (j != buffer.Length)
+        {
+            data.Time = BitConverter.ToUInt32(buffer, j);
+            j += 4;
+            data.Press = BitConverter.ToInt32(buffer, j);
+            j += 4;
+            data.Temp = BitConverter.ToInt32(buffer, j);
+            j += 4;
+            data.Vbat = BitConverter.ToUInt32(buffer, j);
+            j += 4;
+            PrintToTextStream(w, ref data);
+            check += (data.Time == 1 && data.Press == 2 && data.Temp == 3 && data.Vbat == 4) ? 0 : 1;
+        }
+        if (check > 1)
+            Console.WriteLine($"error count={check}");
+    }
+
 }
+
+
+
+

@@ -21,4 +21,10 @@ public class TestPerfDes
     [Benchmark]
     public void DesProtoWithoutRec() => Deserialize.ProtobufReadWithoutRec();
 
+    [Benchmark]
+    public void DesBinReader() => Deserialize.ReadBinRead();
+
+    [Benchmark]
+    public void DesFileStReader() => Deserialize.ReadFileSt();
+
 }

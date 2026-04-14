@@ -27,7 +27,17 @@ internal class Program
          | SerFlatBuffWithoutRec | 349.7 us | 6.43 us |  6.02 us | 348.7 us |  0.55 |    0.01 |   8.3008 |       - |   68.37 KB |        0.11 |
          | SerEdf                | 630.6 us | 7.92 us |  7.41 us | 627.4 us |  1.00 |    0.02 |  78.1250 |  0.9766 |   642.5 KB |        1.00 |
         */
-
+        /*
+         | Method                | Mean     | Error   | StdDev   | Ratio | RatioSD | Gen0    | Gen1   | Allocated | Alloc Ratio |
+         |---------------------- |---------:|--------:|---------:|------:|--------:|--------:|-------:|----------:|------------:|
+         | SerProtobuf           | 249.8 us | 3.73 us |  3.66 us |  0.40 |    0.01 |  1.9531 |      - |  16.38 KB |       0.025 |
+         | SerProtobufWithoutRec | 229.7 us | 4.41 us |  3.91 us |  0.36 |    0.01 | 16.1133 |      - | 132.56 KB |       0.206 |
+         | SerFlatBuffer         | 250.9 us | 1.74 us |  1.46 us |  0.40 |    0.00 | 10.7422 | 0.9766 |  91.14 KB |       0.142 |
+         | SerFlatBuffWithoutRec | 359.3 us | 7.18 us | 15.15 us |  0.57 |    0.02 |  8.3008 |      - |  68.28 KB |       0.106 |
+         | SerEdf                | 630.9 us | 5.96 us |  5.28 us |  1.00 |    0.01 | 78.1250 | 0.9766 | 642.41 KB |       1.000 |
+         | SerBinaryWr           | 248.8 us | 4.92 us |  5.27 us |  0.39 |    0.01 |  0.4883 |      - |   4.41 KB |       0.007 |
+         | SerStreamWr           | 244.5 us | 3.11 us |  2.76 us |  0.39 |    0.01 | 15.6250 |      - | 129.36 KB |       0.201 |
+        */
          var deserialize = BenchmarkRunner.Run<TestPerfDes>();
 
         /*
@@ -39,7 +49,7 @@ internal class Program
         | DesProto             | 432.7 us | 5.76 us | 5.10 us |  0.62 |  7.8125 | 0.9766 |  69.25 KB |        0.35 |
         | DesProtoWithoutRec   | 393.0 us | 2.08 us | 1.94 us |  0.57 | 41.0156 | 9.7656 | 337.06 KB |        1.69 |
          */
-        /*
+/*
         | Method               | Mean     | Error    | StdDev   | Ratio | RatioSD | Gen0     | Gen1    | Allocated  | Alloc Ratio |
         |--------------------- |---------:|---------:|---------:|------:|--------:|---------:|--------:|-----------:|------------:|
         | DesEdf               | 676.4 us |  9.19 us |  8.15 us |  1.00 |    0.02 |  23.4375 |       - |  199.77 KB |        1.00 |
@@ -47,6 +57,17 @@ internal class Program
         | DesFlatBufWithoutRec | 621.5 us | 10.54 us |  8.80 us |  0.92 |    0.02 |   5.8594 |       - |   49.34 KB |        0.25 |
         | DesProto             | 492.0 us |  9.70 us | 11.92 us |  0.73 |    0.02 |   7.8125 |  0.9766 |   69.25 KB |        0.35 |
         | DesProtoWithoutRec   | 956.0 us | 18.35 us | 24.50 us |  1.41 |    0.04 | 523.4375 | 35.1563 | 4279.97 KB |       21.42 |
-        */
-    }
+*/
+/*
+        | Method               | Mean     | Error    | StdDev   | Ratio | RatioSD | Gen0    | Gen1   | Allocated | Alloc Ratio |
+        |--------------------- |---------:|---------:|---------:|------:|--------:|--------:|-------:|----------:|------------:|
+        | DesEdf               | 712.6 us | 14.16 us | 22.04 us |  1.00 |    0.04 | 23.4375 |      - | 199.84 KB |        1.00 |
+        | DesFlatBuf           | 499.5 us |  9.83 us |  9.65 us |  0.70 |    0.03 |  3.9063 |      - |   33.3 KB |        0.17 |
+        | DesFlatBufWithoutRec | 639.4 us | 11.33 us | 10.60 us |  0.90 |    0.03 |  5.8594 |      - |  49.43 KB |        0.25 |
+        | DesProto             | 409.1 us |  5.38 us |  4.77 us |  0.57 |    0.02 |  7.8125 | 0.9766 |  69.34 KB |        0.35 |
+        | DesProtoWithoutRec   | 442.1 us |  2.83 us |  2.36 us |  0.62 |    0.02 | 41.9922 | 9.7656 | 343.85 KB |        1.72 |
+        | DesBinReader         | 415.9 us |  7.59 us | 13.88 us |  0.58 |    0.03 |  0.9766 |      - |  13.99 KB |        0.07 |
+        | DesFileStReader      | 397.4 us |  3.51 us |  2.93 us |  0.56 |    0.02 |  3.4180 |      - |  29.57 KB |        0.15 |
+*/
+}
 }
