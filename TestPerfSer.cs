@@ -47,25 +47,31 @@ public class TestPerfSer
     }
 
 
-    [Benchmark]
-    public void SerProtobuf() => Serialize.SerializeProtobuf(_dataforProto);
+    //[Benchmark]
+    //public void SerProtobuf() => Serialize.SerializeProtobuf(_dataforProto);
 
-    [Benchmark]
-    public void SerProtobufWithoutRec() => Serialize.SerializeProtoWithoutRec(_dataProtoWithoutRec);
+    //[Benchmark]
+    //public void SerProtobufWithoutRec() => Serialize.SerializeProtoWithoutRec(_dataProtoWithoutRec);
 
-    [Benchmark]
-    public void SerFlatBuffer() => Serialize.SerializeFlatBuffer();
+    //[Benchmark]
+    //public void SerFlatBuffer() => Serialize.SerializeFlatBuffer();
 
-    [Benchmark]
-    public void SerFlatBuffWithoutRec() => Serialize.SerializeFlatBufferWithoutVec();
+    //[Benchmark]
+    //public void SerFlatBuffWithoutRec() => Serialize.SerializeFlatBufferWithoutVec();
 
-    [Benchmark(Baseline = true)]
-    public void SerEdf() => Serialize.SerializeEDF(_data);
+    //[Benchmark(Baseline = true)]
+    //public void SerEdf() => Serialize.SerializeEDF(_data);
 
-    [Benchmark]
-    public void SerBinaryWr() => Serialize.SerializeBinaryWr(_data);
+    //[Benchmark]
+    //public void SerBinaryWr() => Serialize.SerializeBinaryWr(_data);
 
     [Benchmark]
     public void SerStreamWr() => Serialize.SerializeFileWr(_data);
+
+    [Benchmark]
+    public void SerMarshall() => Serialize.SerializeMarshal(_data);
+
+    [Benchmark]
+    public void SerMarshall2() => Serialize.SerializeMarshal2(_data);
 
 }

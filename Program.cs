@@ -8,7 +8,7 @@ internal class Program
 
     static void Main(string[] args)
     {
-        var serialize = BenchmarkRunner.Run<TestPerfSer>();
+        //var serialize = BenchmarkRunner.Run<TestPerfSer>();
         /*
          | Method                | Mean     | Error   | StdDev  | Ratio | RatioSD | Gen0    | Gen1   | Allocated | Alloc Ratio |
          |---------------------- |---------:|--------:|--------:|------:|--------:|--------:|-------:|----------:|------------:|

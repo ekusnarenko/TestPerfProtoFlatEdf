@@ -2,6 +2,7 @@
 using Google.Protobuf;
 using LibraryTest1;
 using NetEdf.src;
+using System.Runtime.InteropServices;
 using static LibraryTest.TestPerfSer;
 
 namespace LibraryTest;
@@ -187,6 +188,8 @@ public class Deserialize
         if (check > 1)
             Console.WriteLine($"error count={check}");
     }
+
+
     public static void ReadFileSt()
     {
         using var r = new FileStream(Path.Combine(FilePath, "FileStream.bdf"), FileMode.Open, FileAccess.Read);
@@ -195,7 +198,7 @@ public class Deserialize
         byte[] buffer = new byte[r.Length];
         for (int i = 0; i < buffer.Length; ++i)
             buffer[i] = (byte)r.ReadByte();
-        
+
         r.Close();
         int j = 0;
         int check = 0;
@@ -216,6 +219,44 @@ public class Deserialize
             Console.WriteLine($"error count={check}");
     }
 
+    public static void PrintToTextStream(TextWriter w, ref Span<OmegaDataV1_1> read)
+    {
+        w.Write(read[0].Time);
+        w.Write(';');
+        w.Write(read[0].Press);
+        w.Write(';');
+        w.Write(read[0].Temp);
+        w.Write(';');
+        w.Write(read[0].Vbat);
+        w.Write("\n");
+    }
+
+    public static void ReadMarshal()
+    {
+        using var r = new FileStream(Path.Combine(FilePath, "Marshall.bdf"), FileMode.Open, FileAccess.Read);
+        using TextWriter w = new StreamWriter(File.Create(Path.Combine(FilePath, "Marshall.txt")));
+        Span<byte> buffer = new byte[16];
+        int i = 0;
+        while(r.Position < r.Length)
+        {
+            buffer[i] = (byte)r.ReadByte();
+            i++;
+            if (i == 16)
+            {
+                i = 0;
+                PrintToTextStream(w, ref MemoryMarshal.Cast<byte, OMEGA_DATA_V1_1>(buffer)[0]);
+                buffer.Clear();
+            }
+        }
+        r.Close();
+    }
+
+    //public static void ReadMarshal2(OMEGA_DATA_V1_1[] s)
+    //{
+    //    using var r = new FileStream(Path.Combine(FilePath, "Marshall2.bdf"), FileMode.Open, FileAccess.Read);
+    //    using TextWriter w = new StreamWriter(File.Create(Path.Combine(FilePath, "Marshall2.txt")));
+    //    w.Write(MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan()));
+    //}
 }
 
 

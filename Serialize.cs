@@ -1,8 +1,10 @@
-﻿using Google.FlatBuffers;
+﻿using CommandLine;
+using Google.FlatBuffers;
 using Google.Protobuf;
-using NetEdf.src;
-using static LibraryTest.TestPerfSer;
 using LibraryTest1;
+using NetEdf.src;
+using System.Runtime.InteropServices;
+using static LibraryTest.TestPerfSer;
 
 
 namespace LibraryTest;
@@ -140,11 +142,29 @@ public class Serialize
         using var w = new FileStream(Path.Combine(FilePath, "FileStream.bdf"), FileMode.Create, FileAccess.Write);
         for(int i = 0; i < s.Length; ++i)
         {
+            //var bb = MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan(1));
+            //w.Write(bb);
             w.Write(BitConverter.GetBytes(s[i].Time));
             w.Write(BitConverter.GetBytes(s[i].Press));
             w.Write(BitConverter.GetBytes(s[i].Temp));
             w.Write(BitConverter.GetBytes(s[i].Vbat));
         }
         w.Close();
+    }
+
+    public static void SerializeMarshal(OMEGA_DATA_V1_1[] s)
+    {
+        using var w = new FileStream(Path.Combine(FilePath, "Marshall.bdf"), FileMode.Create, FileAccess.Write);
+        for (int i = 0; i < s.Length; ++i)
+        {
+            w.Write(MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan(i, 1)));
+        }
+        w.Close();
+    }
+
+    public static void SerializeMarshal2(OMEGA_DATA_V1_1[] s)
+    {
+        using var w = new FileStream(Path.Combine(FilePath, "Marshall2.bdf"), FileMode.Create, FileAccess.Write);
+        w.Write(MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan()));
     }
 }
