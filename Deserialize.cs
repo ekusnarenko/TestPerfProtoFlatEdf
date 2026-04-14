@@ -219,15 +219,15 @@ public class Deserialize
             Console.WriteLine($"error count={check}");
     }
 
-    public static void PrintToTextStream(TextWriter w, ref Span<OmegaDataV1_1> read)
+    public static void PrintToTextStream(TextWriter w, ref OmegaDataV1_1 read)
     {
-        w.Write(read[0].Time);
+        w.Write(read.Time);
         w.Write(';');
-        w.Write(read[0].Press);
+        w.Write(read.Press);
         w.Write(';');
-        w.Write(read[0].Temp);
+        w.Write(read.Temp);
         w.Write(';');
-        w.Write(read[0].Vbat);
+        w.Write(read.Vbat);
         w.Write("\n");
     }
 
@@ -235,16 +235,17 @@ public class Deserialize
     {
         using var r = new FileStream(Path.Combine(FilePath, "Marshall.bdf"), FileMode.Open, FileAccess.Read);
         using TextWriter w = new StreamWriter(File.Create(Path.Combine(FilePath, "Marshall.txt")));
-        Span<byte> buffer = new byte[16];
+        ReadOnlySpan<byte> buffer = new byte[16];
         int i = 0;
         while(r.Position < r.Length)
         {
-            buffer[i] = (byte)r.ReadByte();
-            i++;
-            if (i == 16)
+            r.Read(buffer);
+            //i++;
+            if (buffer.Length == 16)
             {
-                i = 0;
-                PrintToTextStream(w, ref MemoryMarshal.Cast<byte, OMEGA_DATA_V1_1>(buffer)[0]);
+                //  i = 0;
+                var read = MemoryMarshal.Read<OmegaDataV1_1>(buffer);
+                PrintToTextStream(w, ref read); 
                 buffer.Clear();
             }
         }

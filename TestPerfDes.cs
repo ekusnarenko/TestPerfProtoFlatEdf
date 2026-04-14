@@ -6,8 +6,8 @@ namespace LibraryTest;
 //[SimpleJob(RuntimeMoniker.HostProcess)]
 public class TestPerfDes
 {
-    [Benchmark(Baseline = true)]
-    public void DesEdf() => Deserialize.EDFRead();
+    //[Benchmark(Baseline = true)]
+    //public void DesEdf() => Deserialize.EDFRead();
 
     //[Benchmark]
     //public void DesFlatBuf() => Deserialize.FlatBuffRead();
@@ -24,8 +24,8 @@ public class TestPerfDes
     //[Benchmark]
     //public void DesBinReader() => Deserialize.ReadBinRead();
 
-    [Benchmark]
-    public void DesFileStReader() => Deserialize.ReadFileSt();
+    //[Benchmark]
+    //public void DesFileStReader() => Deserialize.ReadFileSt();
 
     [Benchmark]
     public void DesMarshall() => Deserialize.ReadMarshal();
