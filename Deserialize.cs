@@ -235,7 +235,7 @@ public class Deserialize
     {
         using var r = new FileStream(Path.Combine(FilePath, "Marshall.bdf"), FileMode.Open, FileAccess.Read);
         using TextWriter w = new StreamWriter(File.Create(Path.Combine(FilePath, "Marshall.txt")));
-        ReadOnlySpan<byte> buffer = new byte[16];
+        Span<byte> buffer = new byte[16];
         int i = 0;
         while(r.Position < r.Length)
         {
