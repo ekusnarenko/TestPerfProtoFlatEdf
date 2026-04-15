@@ -12,8 +12,8 @@ public class TestPerfSer
     public struct OMEGA_DATA_V1_1
     {
         public UInt32 Time { get; set; }
-        public Int32 Press { get; set; }
-        public Int32 Temp { get; set; }
+        public UInt32 Press { get; set; }
+        public UInt32 Temp { get; set; }
         public UInt32 Vbat { get; set; }
     }
 
@@ -38,11 +38,13 @@ public class TestPerfSer
             var protoWithoutRec = new OmegaDataForProto();
             var proto = new OmegaDataV11ForProto();
             protoWithoutRec.Time = proto.Time = _data[i].Time = 1;
-            protoWithoutRec.Press = proto.Press = _data[i].Press = 2;
-            protoWithoutRec.Temp = proto.Temp = _data[i].Temp = 3;
+            protoWithoutRec.Press = proto.Press = 2;
+            protoWithoutRec.Temp = proto.Temp = 3;
             protoWithoutRec.Vbat = proto.Vbat = _data[i].Vbat = 4;
             _dataforProto[i] = proto;
             _dataProtoWithoutRec[i] = protoWithoutRec;
+            _data[i].Press = 2;
+            _data[i].Temp = 3;
         }
     }
 
@@ -59,19 +61,42 @@ public class TestPerfSer
     //[Benchmark]
     //public void SerFlatBuffWithoutRec() => Serialize.SerializeFlatBufferWithoutVec();
 
-    //[Benchmark(Baseline = true)]
-    //public void SerEdf() => Serialize.SerializeEDF(_data);
+    // [Benchmark(Baseline = true)]
+    [Benchmark]
+    public void SerEdf() => Serialize.SerializeEDF(_data);
+
+    [Benchmark]
+    public void SerEdf_nonCRC()
+    {
+        Serialize.SerializeEDF(_data, (sp, acc) => 0);
+    }
+    [Benchmark]
+    public void SerEdf_nonCRC_nonDecompose()
+    {
+        IEnumerator<object> MyDecomposer(object obj)
+        {
+            var data = (OMEGA_DATA_V1_1)obj;
+            return (new object[]
+            { data.Time, data.Press, data.Temp, data.Vbat })
+            .AsEnumerable().GetEnumerator();
+        }
+        ;
+        Serialize.SerializeEDF(_data, (sp, acc) => 0, MyDecomposer);
+    }
+
+
 
     //[Benchmark]
     //public void SerBinaryWr() => Serialize.SerializeBinaryWr(_data);
 
-    [Benchmark]
+    //[Benchmark]
+    [Benchmark(Baseline = true)]
     public void SerStreamWr() => Serialize.SerializeFileWr(_data);
 
-    [Benchmark]
+    //[Benchmark]
     public void SerMarshall() => Serialize.SerializeMarshal(_data);
 
-    [Benchmark]
-    public void SerMarshall2() => Serialize.SerializeMarshal2(_data);
+    //[Benchmark]
+    //public void SerMarshall2() => Serialize.SerializeMarshal2(_data);
 
 }

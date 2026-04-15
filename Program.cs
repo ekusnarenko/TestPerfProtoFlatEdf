@@ -8,7 +8,7 @@ internal class Program
 
     static void Main(string[] args)
     {
-        //var serialize = BenchmarkRunner.Run<TestPerfSer>();
+        var serialize = BenchmarkRunner.Run<TestPerfSer>();
         /*
          | Method                | Mean     | Error   | StdDev  | Ratio | RatioSD | Gen0    | Gen1   | Allocated | Alloc Ratio |
          |---------------------- |---------:|--------:|--------:|------:|--------:|--------:|-------:|----------:|------------:|
@@ -38,7 +38,7 @@ internal class Program
          | SerBinaryWr           | 248.8 us | 4.92 us |  5.27 us |  0.39 |    0.01 |  0.4883 |      - |   4.41 KB |       0.007 |
          | SerStreamWr           | 244.5 us | 3.11 us |  2.76 us |  0.39 |    0.01 | 15.6250 |      - | 129.36 KB |       0.201 |
         */
-         var deserialize = BenchmarkRunner.Run<TestPerfDes>();
+       //  var deserialize = BenchmarkRunner.Run<TestPerfDes>();
 
         /*
         | Method               | Mean     | Error   | StdDev  | Ratio | Gen0    | Gen1   | Allocated | Alloc Ratio |

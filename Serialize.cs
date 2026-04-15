@@ -1,5 +1,4 @@
-﻿using CommandLine;
-using Google.FlatBuffers;
+﻿using Google.FlatBuffers;
 using Google.Protobuf;
 using LibraryTest1;
 using NetEdf.src;
@@ -29,7 +28,7 @@ public class Serialize
     {
         const int bufferSize = 64 * 1024;
 
-        using var fs = new FileStream(Path.Combine(FilePath,"ProtobufTestWithoutRec.bdf"), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan);
+        using var fs = new FileStream(Path.Combine(FilePath, "ProtobufTestWithoutRec.bdf"), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan);
         using var buffered = new BufferedStream(fs, bufferSize);
         var cos = new CodedOutputStream(buffered);
 
@@ -47,9 +46,9 @@ public class Serialize
     //FlatBuffer
     public static void SerializeFlatBufferWithoutVec()
     {
-        using var write = File.Create(Path.Combine(FilePath,"FlactBufWitoutVec.bdf"));
+        using var write = File.Create(Path.Combine(FilePath, "FlactBufWitoutVec.bdf"));
         FlatBufferBuilder builder = new FlatBufferBuilder(1024);
-       
+
         var rnd = new Random();
         for (var i = 0; i < 1000; i++)
         {
@@ -69,7 +68,7 @@ public class Serialize
     }
     public static void SerializeFlatBuffer()
     {
-       string fileName = Path.Combine(FilePath, "FlatBuffer.bdf");
+        string fileName = Path.Combine(FilePath, "FlatBuffer.bdf");
 
         var random = new Random();
 
@@ -97,7 +96,9 @@ public class Serialize
     }
 
     //EDF
-    public static void SerializeEDF(OMEGA_DATA_V1_1[] s)
+    public static void SerializeEDF(OMEGA_DATA_V1_1[] s
+        , BinWriter.CalcFunc? calc = null
+        , BinWriter.CreateEnumeratorFunc? decompose = null)
     {
         var typeRec = new TypeRec()
         {
@@ -108,26 +109,34 @@ public class Serialize
                 Childs =
                 [
                     new(PoType.UInt32, "Time"),
-                    new(PoType.Int32, "Press"),
-                    new(PoType.Int32, "Temp"),
+                    new(PoType.UInt32, "Press"),
+                    new(PoType.UInt32, "Temp"),
                     new(PoType.UInt32, "Vbat")
 
                 ]
             }
         };
         using (var file = File.Create(Path.Combine(FilePath, "EDFTest.bdf")))
-        using (var w = new BinWriter(file))
+        //  using (var writer = new BinWriter(file)) 
+        using (var wm = new BinWriter(file))
         {
-            w.Write(typeRec);
+            if (calc is not null)
+                wm.Calc = calc;
+            if (decompose is not null)
+                wm.CreateEnumerator = decompose;
+
+            wm.Write(typeRec);
             foreach (var item in s)
-                w.Write(item);
+            {
+                wm.Write(item);
+            }
         }
     }
 
     public static void SerializeBinaryWr(OMEGA_DATA_V1_1[] s)
     {
         using var w = new BinaryWriter(File.Create(Path.Combine(FilePath, "BinaryWriterFile.bdf")));
-        for(int i = 0; i < s.Length; i++)
+        for (int i = 0; i < s.Length; i++)
         {
             w.Write(s[i].Time);
             w.Write(s[i].Press);
@@ -140,7 +149,7 @@ public class Serialize
     public static void SerializeFileWr(OMEGA_DATA_V1_1[] s)
     {
         using var w = new FileStream(Path.Combine(FilePath, "FileStream.bdf"), FileMode.Create, FileAccess.Write);
-        for(int i = 0; i < s.Length; ++i)
+        for (int i = 0; i < s.Length; ++i)
         {
             //var bb = MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan(1));
             //w.Write(bb);

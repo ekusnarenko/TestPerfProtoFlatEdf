@@ -178,8 +178,8 @@ public class Deserialize
         for (int i = 0; i < 1000; ++i)
         {
             data.Time = r.ReadUInt32();
-            data.Press = r.ReadInt32();
-            data.Temp = r.ReadInt32();
+            data.Press = r.ReadUInt32();
+            data.Temp = r.ReadUInt32();
             data.Vbat = r.ReadUInt32();
             PrintToTextStream(w, ref data);
             check += (data.Time == 1 && data.Press == 2 && data.Temp == 3 && data.Vbat == 4) ? 0 : 1;
@@ -206,9 +206,9 @@ public class Deserialize
         {
             data.Time = BitConverter.ToUInt32(buffer, j);
             j += 4;
-            data.Press = BitConverter.ToInt32(buffer, j);
+            data.Press = BitConverter.ToUInt32(buffer, j);
             j += 4;
-            data.Temp = BitConverter.ToInt32(buffer, j);
+            data.Temp = BitConverter.ToUInt32(buffer, j);
             j += 4;
             data.Vbat = BitConverter.ToUInt32(buffer, j);
             j += 4;
