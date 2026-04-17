@@ -124,7 +124,7 @@ public class Serialize
                 wm.Calc = calc;
             if (decompose is not null)
                 wm.CreateEnumerator = decompose;
-
+            var constr = new OMEGA_DATA_V1_1();
             wm.Write(typeRec);
             foreach (var item in s)
             {

@@ -1,22 +1,29 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Google.FlatBuffers;
+using NetEdf;
+//using EdfBinGenerator;
 
 namespace LibraryTest;
 
+[DecomposeGenerator]
+public partial struct OMEGA_DATA_V1_1
+{
+    public UInt32 Time { get; set; }
+    public UInt32 Press { get; set; }
+    public UInt32 Temp { get; set; }
+    public UInt32 Vbat { get; set; }
+}
+
+
 [MemoryDiagnoser]
 [SimpleJob(RuntimeMoniker.Net10_0)]
+
 public class TestPerfSer
 {
     // [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-    public struct OMEGA_DATA_V1_1
-    {
-        public UInt32 Time { get; set; }
-        public UInt32 Press { get; set; }
-        public UInt32 Temp { get; set; }
-        public UInt32 Vbat { get; set; }
-    }
 
+   
 
     //[Params(500)]
     public int Count { get; set; } = 1000;
@@ -62,8 +69,8 @@ public class TestPerfSer
     //public void SerFlatBuffWithoutRec() => Serialize.SerializeFlatBufferWithoutVec();
 
     // [Benchmark(Baseline = true)]
-    [Benchmark]
-    public void SerEdf() => Serialize.SerializeEDF(_data);
+    //[Benchmark]
+    //public void SerEdf() => Serialize.SerializeEDF(_data);
 
     [Benchmark]
     public void SerEdf_nonCRC()
@@ -83,18 +90,32 @@ public class TestPerfSer
         ;
         Serialize.SerializeEDF(_data, (sp, acc) => 0, MyDecomposer);
     }
-
-
+    [Benchmark(Baseline = true)]
+    public void SerEdfDecomGen()
+    {
+        {
+            IEnumerator<object> MyDecomposer(object obj)
+            {
+                OMEGA_DATA_V1_1 data = new() { Time = 1, Press = 2, Temp = 3, Vbat = 4 }; 
+                var constr = new OMEGA_DATA_V1_1();
+                var flatObj = constr.Decompose(data);
+                return flatObj
+                .AsEnumerable().GetEnumerator();
+            }
+      ;
+            Serialize.SerializeEDF(_data, (sp, acc) => 0, MyDecomposer);
+        }
+    }
 
     //[Benchmark]
     //public void SerBinaryWr() => Serialize.SerializeBinaryWr(_data);
 
     //[Benchmark]
-    [Benchmark(Baseline = true)]
-    public void SerStreamWr() => Serialize.SerializeFileWr(_data);
+    //[Benchmark(Baseline = true)]
+    //public void SerStreamWr() => Serialize.SerializeFileWr(_data);
 
-    //[Benchmark]
-    public void SerMarshall() => Serialize.SerializeMarshal(_data);
+    ////[Benchmark]
+    //public void SerMarshall() => Serialize.SerializeMarshal(_data);
 
     //[Benchmark]
     //public void SerMarshall2() => Serialize.SerializeMarshal2(_data);

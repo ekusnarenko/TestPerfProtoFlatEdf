@@ -19,7 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EDF\srcNet\EdfNet\NetEdf.csproj" />
+	  <ProjectReference Include="..\..\EmbeddedDataFormat\EdfBinGenerator\EdfBinGenerator.csproj"
+						OutputItemType="Analyzer"/>
+    <ProjectReference Include="..\..\EmbeddedDataFormat\srcNet\EdfNet\NetEdf.csproj" />
+   <!-- <ProjectReference Include="..\EDF\srcNet\EdfNet\NetEdf.csproj" />
+  -->
   </ItemGroup>
 
 </Project>
