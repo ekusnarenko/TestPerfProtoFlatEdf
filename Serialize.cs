@@ -2,7 +2,8 @@
 using Google.Protobuf;
 using LibraryTest1;
 using NetEdf.src;
-using System.Runtime.InteropServices;
+using NetEdf;
+using EdfBinGenerator;
 using static LibraryTest.TestPerfSer;
 
 
@@ -12,6 +13,7 @@ namespace LibraryTest;
 public class Serialize
 {
     private static string FilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
     //Protobuf
     public static void SerializeProtobuf(OmegaDataV11ForProto[] s)
     {
@@ -28,7 +30,8 @@ public class Serialize
     {
         const int bufferSize = 64 * 1024;
 
-        using var fs = new FileStream(Path.Combine(FilePath, "ProtobufTestWithoutRec.bdf"), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan);
+        using var fs = new FileStream(Path.Combine(FilePath, "ProtobufTestWithoutRec.bdf"), FileMode.Create,
+            FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan);
         using var buffered = new BufferedStream(fs, bufferSize);
         var cos = new CodedOutputStream(buffered);
 
@@ -39,6 +42,7 @@ public class Serialize
             item.WriteTo(cos);
 
         }
+
         cos.Flush();
         buffered.Flush();
     }
@@ -66,6 +70,7 @@ public class Serialize
             write.Write(bytes);
         }
     }
+
     public static void SerializeFlatBuffer()
     {
         string fileName = Path.Combine(FilePath, "FlatBuffer.bdf");
@@ -78,11 +83,11 @@ public class Serialize
         for (int i = 0; i < 1000; ++i)
         {
             offsets[i] = OmegaDataV1_1.CreateOmegaDataV1_1(
-            builder,
-            1,
-            2,
-            3,
-            4);
+                builder,
+                1,
+                2,
+                3,
+                4);
         }
 
         var vectorOffset = OmegaDataList.CreateItemsVector(builder, offsets);
@@ -96,84 +101,110 @@ public class Serialize
     }
 
     //EDF
-    public static void SerializeEDF(OMEGA_DATA_V1_1[] s
-        , BinWriter.CalcFunc? calc = null
+    public static void SerializeEDF(BinWriter.CalcFunc? calc = null
         , BinWriter.CreateEnumeratorFunc? decompose = null)
     {
-        var typeRec = new TypeRec()
+        TypeInf comlexVarInf = new()
         {
-            Inf = new()
-            {
-                Type = PoType.Struct,
-                Name = "OMEGA_DATA_V1_1",
-                Childs =
-                [
-                    new(PoType.UInt32, "Time"),
-                    new(PoType.UInt32, "Press"),
-                    new(PoType.UInt32, "Temp"),
-                    new(PoType.UInt32, "Vbat")
-
-                ]
-            }
+            Type = PoType.Struct,
+            Name = "ComplexVariable1",
+            Childs =
+            [
+                new(PoType.Int64, "time"),
+                new()
+                {
+                    Type = PoType.Struct, Name = "State", Dims = [3],
+                    Childs =
+                    [
+                        new(PoType.Int8, "text"),
+                        new(PoType.Struct, "Pos")
+                        {
+                            Childs =
+                            [
+                                new(PoType.Int32, "x"),
+                                new(PoType.Int32, "y"),
+                            ]
+                        },
+                        new(PoType.Double, "Temp", [2, 2]),
+                    ]
+                }
+            ]
         };
-        using (var file = File.Create(Path.Combine(FilePath, "EDFTest.bdf")))
-        //  using (var writer = new BinWriter(file)) 
-        using (var wm = new BinWriter(file))
+        var cv = new ComplexVariable1()
         {
+            Time = -123,
+            State =
+            [
+                new()
+                {
+                    Text = 1, Pos = new() { x = 11, y = 12 }, Temp = new double[2, 2] { { 1.1, 1.2 }, { 1.3, 1.4 } }
+                },
+                new()
+                {
+                    Text = 2, Pos = new() { x = 21, y = 22 }, Temp = new double[2, 2] { { 2.1, 2.2 }, { 2.3, 2.4 } }
+                },
+                new()
+                {
+                    Text = 3, Pos = new() { x = 31, y = 32 }, Temp = new double[2, 2] { { 3.1, 3.2 }, { 3.3, 3.4 } }
+                },
+            ]
+        };
+        using (var file = File.Create(Path.Combine(FilePath, "EDFTest.bdf"))) 
+        using (var w = new BinWriter(file)) 
+        {
+            w.Write(new TypeRec() { Inf = comlexVarInf });
             if (calc is not null)
-                wm.Calc = calc;
-            if (decompose is not null)
-                wm.CreateEnumerator = decompose;
-            var constr = new OMEGA_DATA_V1_1();
-            wm.Write(typeRec);
-            foreach (var item in s)
-            {
-                wm.Write(item);
-            }
+                w.Calc = calc;
+            if(decompose is not null)
+                w.CreateEnumerator = decompose;
+            for(int i = 0; i < 1000; ++i)
+                w.Write(cv);
         }
-    }
-
-    public static void SerializeBinaryWr(OMEGA_DATA_V1_1[] s)
-    {
-        using var w = new BinaryWriter(File.Create(Path.Combine(FilePath, "BinaryWriterFile.bdf")));
-        for (int i = 0; i < s.Length; i++)
-        {
-            w.Write(s[i].Time);
-            w.Write(s[i].Press);
-            w.Write(s[i].Temp);
-            w.Write(s[i].Vbat);
-        }
-        w.Close();
-    }
-
-    public static void SerializeFileWr(OMEGA_DATA_V1_1[] s)
-    {
-        using var w = new FileStream(Path.Combine(FilePath, "FileStream.bdf"), FileMode.Create, FileAccess.Write);
-        for (int i = 0; i < s.Length; ++i)
-        {
-            //var bb = MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan(1));
-            //w.Write(bb);
-            w.Write(BitConverter.GetBytes(s[i].Time));
-            w.Write(BitConverter.GetBytes(s[i].Press));
-            w.Write(BitConverter.GetBytes(s[i].Temp));
-            w.Write(BitConverter.GetBytes(s[i].Vbat));
-        }
-        w.Close();
-    }
-
-    public static void SerializeMarshal(OMEGA_DATA_V1_1[] s)
-    {
-        using var w = new FileStream(Path.Combine(FilePath, "Marshall.bdf"), FileMode.Create, FileAccess.Write);
-        for (int i = 0; i < s.Length; ++i)
-        {
-            w.Write(MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan(i, 1)));
-        }
-        w.Close();
-    }
-
-    public static void SerializeMarshal2(OMEGA_DATA_V1_1[] s)
-    {
-        using var w = new FileStream(Path.Combine(FilePath, "Marshall2.bdf"), FileMode.Create, FileAccess.Write);
-        w.Write(MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan()));
     }
 }
+
+/*public static void SerializeBinaryWr(OMEGA_DATA_V1_1[] s)
+{
+    using var w = new BinaryWriter(File.Create(Path.Combine(FilePath, "BinaryWriterFile.bdf")));
+    for (int i = 0; i < s.Length; i++)
+    {
+        w.Write(s[i].Time);
+        w.Write(s[i].Press);
+        w.Write(s[i].Temp);
+        w.Write(s[i].Vbat);
+    }
+    w.Close();
+}
+
+public static void SerializeFileWr(OMEGA_DATA_V1_1[] s)
+{
+    using var w = new FileStream(Path.Combine(FilePath, "FileStream.bdf"), FileMode.Create, FileAccess.Write);
+    for (int i = 0; i < s.Length; ++i)
+    {
+        //var bb = MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan(1));
+        //w.Write(bb);
+        w.Write(BitConverter.GetBytes(s[i].Time));
+        w.Write(BitConverter.GetBytes(s[i].Press));
+        w.Write(BitConverter.GetBytes(s[i].Temp));
+        w.Write(BitConverter.GetBytes(s[i].Vbat));
+    }
+    w.Close();
+}
+
+public static void SerializeMarshal(OMEGA_DATA_V1_1[] s)
+{
+    using var w = new FileStream(Path.Combine(FilePath, "Marshall.bdf"), FileMode.Create, FileAccess.Write);
+    for (int i = 0; i < s.Length; ++i)
+    {
+        w.Write(MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan(i, 1)));
+    }
+    w.Close();
+}
+
+public static void SerializeMarshal2(OMEGA_DATA_V1_1[] s)
+{
+    using var w = new FileStream(Path.Combine(FilePath, "Marshall2.bdf"), FileMode.Create, FileAccess.Write);
+    w.Write(MemoryMarshal.Cast<OMEGA_DATA_V1_1, byte>(s.AsSpan()));
+}
+}
+*/

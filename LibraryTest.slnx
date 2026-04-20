@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="../../EmbeddedDataFormat/EdfBinGenerator/EdfBinGenerator.csproj" />
-  <Project Path="../../EmbeddedDataFormat/srcNet/EdfNet/NetEdf.csproj" />
+  <Project Path="../EDF/EdfBinGenerator/EdfBinGenerator.csproj" />
+  <Project Path="../EDF/srcNet/EdfNet/NetEdf.csproj" />
   <Project Path="LibraryTest.csproj" />
 </Solution>
