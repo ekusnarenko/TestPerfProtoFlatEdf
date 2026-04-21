@@ -161,7 +161,16 @@ public class TestPerfSer
             return ((ComplexVariable1)obj).Decompose().AsEnumerable().GetEnumerator();
         } 
         Serialize.SerializeEDF((sp, acc) => 0, MyDecomposer);
-        
+    }
+    [Benchmark]
+    public void SerEdfDecomGenCRC()
+    {
+        IEnumerator<object> MyDecomposer(object obj)
+        {
+            return ((ComplexVariable1)obj).Decompose().AsEnumerable().GetEnumerator();
+        }
+        Serialize.SerializeEDF(null, MyDecomposer);
+
     }
     // [Benchmark]
     // public void SerEdfDecomGen2()
@@ -173,7 +182,7 @@ public class TestPerfSer
     //     Serialize.SerializeEDF( (sp, acc) => 0, MyDecomposer2);
     // }
 
-    
+
     // [Benchmark]
     // public void SerBinaryWr() => Serialize.SerializeBinaryWr(_data);
 
